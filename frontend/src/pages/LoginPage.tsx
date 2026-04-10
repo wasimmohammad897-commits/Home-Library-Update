@@ -34,6 +34,7 @@ export function LoginPage() {
          fontWeight: 600,
          lineHeight: '1.3',
          marginBottom: '12px',
+         textAlign: 'center'
          }}
         >С возвращением</h1>
           <p className="login-subtitle">
