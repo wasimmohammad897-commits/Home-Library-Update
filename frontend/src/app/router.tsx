@@ -1,0 +1,192 @@
+import { createBrowserRouter, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
+import { LoginPage } from '../pages/LoginPage';
+import { RegisterPage } from '../pages/RegisterPage';
+import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
+import { LibrariesPage } from '../pages/LibrariesPage';
+import { LibraryDetailsPage } from '../pages/LibraryDetailsPage';
+import { InvitePage } from '../pages/InvitePage';
+import { JoinLibraryPage } from '../pages/JoinLibraryPage';
+import { ReaderPage } from '../pages/ReaderPage';
+import { ProfilePage } from '../pages/ProfilePage';
+import { getCurrentSession, logout } from '../lib/mockApi';
+import { EditProfilePage } from '../pages/EditProfilePage';
+import { AddBookPage } from '../pages/AddBookPage';
+import { GoogleConnectPage } from '../pages/GoogleConnectPage';
+
+function AppShell() {
+  const session = getCurrentSession();
+  const location = useLocation();
+
+  const isAuthPage =
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname === '/forgot-password';
+    location.pathname === '/google-connect';
+
+  return (
+    <div className="app-shell">
+      {!isAuthPage && (
+        <header className="topbar">
+          <div>
+            <Link to="/libraries" className="text-link" style={{ textDecoration: 'none' }}>
+              <h1
+                style={{
+                  marginBottom: '4px',
+                  color: '#8b6b4f',
+                }}
+              >
+                Home Library
+              </h1>
+            </Link>
+
+            <p
+              className="eyebrow"
+              style={{
+                fontSize: '14px',
+                opacity: 0.7,
+                margin: 0,
+              }}
+            >
+              Your personal reading system
+            </p>
+          </div>
+
+          <div className="topbar-actions">
+            {session ? (
+              <>
+                <Link to="/profile" className="user-badge">
+                  {session.userName}
+                </Link>
+
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    logout();
+                    window.location.href = '/login';
+                  }}
+                >
+                  Выйти
+                </button>
+              </>
+            ) : (
+              <Link className="secondary-button" to="/login">
+                Войти
+              </Link>
+            )}
+          </div>
+        </header>
+      )}
+
+      {isAuthPage ? (
+  <Outlet />
+) : (
+        <div className="workspace-layout">
+          {session && (
+            <nav className="sidebar">
+              <Link
+                className={location.pathname.startsWith('/libraries') ? 'nav-link active' : 'nav-link'}
+                to="/libraries"
+              >
+                Библиотеки
+              </Link>
+
+              <Link
+                className={location.pathname.startsWith('/join') ? 'nav-link active' : 'nav-link'}
+                to="/join"
+              >
+                Поиск по ID
+              </Link>
+
+              <Link
+                className={location.pathname.startsWith('/profile') ? 'nav-link active' : 'nav-link'}
+                to="/profile"
+              >
+                Профиль
+              </Link>
+            </nav>
+          )}
+
+          <main className="page-content">
+            <Outlet />
+          </main>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RequireAuth() {
+  const session = getCurrentSession();
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
+}
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AppShell />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/libraries" replace />,
+      },
+      {
+        path: 'login',
+        element: <LoginPage />,
+      },
+      {
+        path: 'register',
+        element: <RegisterPage />,
+      },
+      {
+        path: 'forgot-password',
+        element: <ForgotPasswordPage />,
+      },
+      {
+  path: 'google-connect',
+  element: <GoogleConnectPage />,
+},
+      {
+        element: <RequireAuth />,
+        children: [
+          {
+            path: 'libraries',
+            element: <LibrariesPage />,
+          },
+          {
+            path: 'join',
+            element: <JoinLibraryPage />,
+          },
+          {
+            path: 'profile',
+            element: <ProfilePage />,
+          },
+          {
+            path: 'libraries/:libraryId',
+            element: <LibraryDetailsPage />,
+          },
+          {
+            path: 'libraries/:libraryId/add-book',
+            element: <AddBookPage />,
+          },
+          {
+            path: 'reader/:libraryId/:bookId',
+            element: <ReaderPage />,
+          },
+          {
+            path: 'profile/edit',
+            element: <EditProfilePage />,
+          },
+        ],
+      },
+      {
+        path: 'invite/:token',
+        element: <InvitePage />,
+      },
+    ],
+  },
+]);
