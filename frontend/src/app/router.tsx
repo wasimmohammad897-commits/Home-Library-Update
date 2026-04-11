@@ -18,10 +18,10 @@ function AppShell() {
   const location = useLocation();
 
   const isAuthPage =
-    location.pathname === '/login' ||
-    location.pathname === '/register' ||
-    location.pathname === '/forgot-password';
-    location.pathname === '/google-connect';
+  location.pathname === '/login' ||
+  location.pathname === '/register' ||
+  location.pathname === '/forgot-password' ||
+  location.pathname === '/google-connect';
 
   return (
     <div className="app-shell">
@@ -147,9 +147,9 @@ export const router = createBrowserRouter([
         element: <ForgotPasswordPage />,
       },
       {
-  path: 'google-connect',
-  element: <GoogleConnectPage />,
-},
+        path: 'google-connect',
+        element: <GoogleConnectPage />,
+      },
       {
         element: <RequireAuth />,
         children: [

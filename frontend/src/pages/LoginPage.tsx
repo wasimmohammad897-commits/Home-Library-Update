@@ -71,9 +71,7 @@ export function LoginPage() {
             <span>Продолжить через Google</span>
           </button>
 
-          <div className="login-divider">
-            <span>или</span>
-          </div>
+          <div className="divider">или</div>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <label className="form-group">
